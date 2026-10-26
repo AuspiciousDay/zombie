@@ -25,13 +25,10 @@ public class PlayerShooter : MonoBehaviour
         {
             gun.Fire();
         }
-        else if (playerInput.Reload)
+        else if (playerInput.Reload && gun.Reload())
         {            
-            if (gun.Reload())
-            {
-                playerAnimator.SetTrigger(IdReload);
-                gun.Reload();
-            }            
+            playerAnimator.SetTrigger(IdReload);
+            gun.Reload();                     
         }
     }
     

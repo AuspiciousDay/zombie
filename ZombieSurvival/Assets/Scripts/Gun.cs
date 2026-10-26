@@ -39,7 +39,12 @@ public class Gun : MonoBehaviour
         bulletLineRenderer.positionCount =2;
         bulletLineRenderer.enabled = false;
     }
-    
+
+    private void Start()
+    {
+        uiManager.SetAmmoText(magAmmo,ammoRemain);
+    }
+
     private void OnEnable()
     {
         ammoRemain = gunData.startAmmoRemain;
@@ -80,7 +85,7 @@ public class Gun : MonoBehaviour
             hitPosition = fireTransform.position + fireTransform.forward * fireDistance;
         }
 
-        StartCoroutine(ShotEffect(hitPosition));
+        StartCoroutine(CoShotEffect(hitPosition));
 
         magAmmo--;
         uiManager.SetAmmoText(magAmmo,ammoRemain);
@@ -91,7 +96,7 @@ public class Gun : MonoBehaviour
         }
     }
 
-    private IEnumerator ShotEffect(Vector3 hitPosition)
+    private IEnumerator CoShotEffect(Vector3 hitPosition)
     {
         muzzleFlasgEffect.Play();
         shellEjectEffect.Play();
@@ -108,20 +113,26 @@ public class Gun : MonoBehaviour
 
     public bool Reload() 
     {
-        if(CurrentState != State.Realoading && ammoRemain != 0)
+        if(CurrentState != State.Realoading && ammoRemain >= 0 && magAmmo != gunData.magCapacity)
         {
-            StartCoroutine(Reloading());
+            StartCoroutine(CoReload());
             return true;
         }
         return false;
     }
-    private IEnumerator Reloading()
+    private IEnumerator CoReload()
     {
         gunAudioPlayer.PlayOneShot(gunData.reloadClip);
         CurrentState = State.Realoading;
 
         yield return new WaitForSeconds(gunData.reloadTime);
 
+        int ammoToFill = Mathf.Min(gunData.magCapacity - magAmmo, ammoRemain);
+
+        magAmmo += ammoToFill;
+        ammoRemain -= ammoToFill;
+        
+        /* 
         if(magAmmo == 0)
         {
             ammoRemain -= gunData.magCapacity;
@@ -132,7 +143,8 @@ public class Gun : MonoBehaviour
             ammoRemain = ammoRemain - (gunData.magCapacity - magAmmo);
             magAmmo = gunData.magCapacity;
         }
-        
+        */
+
         uiManager.SetAmmoText(magAmmo,ammoRemain);
         CurrentState = State.Ready;
     }
