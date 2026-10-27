@@ -10,7 +10,7 @@ public class Gun : MonoBehaviour
         Realoading,
     }
 
-    public State CurrentState {get; private set;}
+    public State CurrentState { get; private set; }
 
     public Transform fireTransform;
 
@@ -36,20 +36,20 @@ public class Gun : MonoBehaviour
         bulletLineRenderer = GetComponent<LineRenderer>();
         gunAudioPlayer = GetComponent<AudioSource>();
 
-        bulletLineRenderer.positionCount =2;
+        bulletLineRenderer.positionCount = 2;
         bulletLineRenderer.enabled = false;
     }
 
     private void Start()
     {
-        uiManager.SetAmmoText(magAmmo,ammoRemain);
+        uiManager.SetAmmoText(magAmmo, ammoRemain);
     }
 
     private void OnEnable()
     {
         ammoRemain = gunData.startAmmoRemain;
         magAmmo = gunData.magCapacity;
-        uiManager.SetAmmoText(magAmmo,ammoRemain);
+        uiManager.SetAmmoText(magAmmo, ammoRemain);
 
         CurrentState = State.Ready;
         lastFireTime = 0f;
@@ -57,7 +57,7 @@ public class Gun : MonoBehaviour
 
     public void Fire()
     {
-        if(CurrentState == State.Ready && Time.time >= lastFireTime + gunData.timeBetFire)
+        if (CurrentState == State.Ready && Time.time >= lastFireTime + gunData.timeBetFire)
         {
             lastFireTime = Time.time;
             Shoot();
@@ -71,11 +71,11 @@ public class Gun : MonoBehaviour
         Vector3 hitPosition;
 
         Ray ray = new Ray(fireTransform.position, fireTransform.forward);
-        if(Physics.Raycast(ray, out RaycastHit hit, fireDistance, targetLayer))
+        if (Physics.Raycast(ray, out RaycastHit hit, fireDistance, targetLayer))
         {
             hitPosition = hit.point;
             IDamageable target = hit.collider.GetComponent<IDamageable>();
-            if(target != null)
+            if (target != null)
             {
                 target.OnDamage(gunData.damage, hit.point, hit.normal);
             }
@@ -88,9 +88,9 @@ public class Gun : MonoBehaviour
         StartCoroutine(CoShotEffect(hitPosition));
 
         magAmmo--;
-        uiManager.SetAmmoText(magAmmo,ammoRemain);
+        uiManager.SetAmmoText(magAmmo, ammoRemain);
 
-        if(magAmmo == 0)
+        if (magAmmo == 0)
         {
             CurrentState = State.Empty;
         }
@@ -111,9 +111,9 @@ public class Gun : MonoBehaviour
         bulletLineRenderer.enabled = false;
     }
 
-    public bool Reload() 
+    public bool Reload()
     {
-        if(CurrentState != State.Realoading && ammoRemain >= 0 && magAmmo != gunData.magCapacity)
+        if (CurrentState != State.Realoading && ammoRemain >= 0 && magAmmo != gunData.magCapacity)
         {
             StartCoroutine(CoReload());
             return true;
@@ -131,7 +131,7 @@ public class Gun : MonoBehaviour
 
         magAmmo += ammoToFill;
         ammoRemain -= ammoToFill;
-        
+
         /* 
         if(magAmmo == 0)
         {
@@ -145,7 +145,13 @@ public class Gun : MonoBehaviour
         }
         */
 
-        uiManager.SetAmmoText(magAmmo,ammoRemain);
+        uiManager.SetAmmoText(magAmmo, ammoRemain);
         CurrentState = State.Ready;
+    }
+
+    public void AddAmmoRemain(int Ammo)
+    {
+        ammoRemain += Ammo;
+        uiManager.SetAmmoText(magAmmo, ammoRemain);
     }
 }

@@ -6,7 +6,7 @@ public class PlayerMovement : MonoBehaviour
 
     public float moveSpeed = 5f;
     public float rotateSpeed = 180f;
-    
+
     private Animator playerAnimator;
     private PlayerInput playerInput;
     private Rigidbody playerRigidbody;
@@ -26,9 +26,26 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate() // 물리관련, 고정된 프레임마다 호출
     {
         float angle = playerInput.Rotate * rotateSpeed * Time.deltaTime;
-        playerRigidbody.MoveRotation(playerRigidbody.rotation * Quaternion.Euler(0f,  angle, 0f));
+        playerRigidbody.MoveRotation(playerRigidbody.rotation * Quaternion.Euler(0f, angle, 0f));
 
         Vector3 delta = playerInput.Move * transform.forward * moveSpeed * Time.deltaTime; //사용자 입력값(입력을 받을때만 움직이도록), 방향, 속도, 시간
         playerRigidbody.MovePosition(playerRigidbody.position + delta);
     }
 }
+
+
+/*
+
+private void OnTriggerEnter(Collider other)
+{
+    if(other.CompareTag(Item))
+    {
+        Item item = other.GetComponent<IItem>();
+        if(item != null)
+        {
+            item.Use(gameObject);
+        }
+    }
+}
+
+*/

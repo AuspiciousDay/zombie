@@ -390,12 +390,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 512
   traceDistance: 10
+  attackDistance: 1.5
   bloodEffect: {fileID: 1148974168935602428}
   zombieCollider: {fileID: 3608395662541861520}
   zombieRenderer: {fileID: 5903351497854914338}
   hitClip: {fileID: 8300000, guid: c3d8accfc053f004ca665a1c8c4a6919, type: 3}
   deathClip: {fileID: 8300000, guid: b86f03005ed394911b43027aeaaedeb7, type: 3}
   damage: 10
+  attackInterval: 1
 --- !u!4 &5903351497843711586 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 400096, guid: 6bc76eedb6629574a83870562bc0c4ee,

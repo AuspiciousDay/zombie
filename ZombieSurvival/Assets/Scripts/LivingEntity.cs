@@ -4,15 +4,15 @@ using UnityEngine.Events;
 public class LivingEntity : MonoBehaviour, IDamageable
 {
     public float startingHealth = 100f;
-    public float Health {get; private set;}
-    public bool IsDeath {get; private set;}
+    public float Health { get; private set; }
+    public bool IsDeath { get; private set; }
 
     public UnityEvent OnDead;
 
     protected virtual void OnEnable()
     {
         IsDeath = false;
-        Health = startingHealth;        
+        Health = startingHealth;
     }
 
     public virtual void OnDamage(float damage, Vector3 hitPoint, Vector3 hitNormal)
@@ -23,7 +23,7 @@ public class LivingEntity : MonoBehaviour, IDamageable
         }
 
         Health -= damage;
-        if(Health <= 0)
+        if (Health <= 0)
         {
             Health = 0f;
             Die();
@@ -35,4 +35,21 @@ public class LivingEntity : MonoBehaviour, IDamageable
         IsDeath = true;
         OnDead.Invoke();
     }
+
+    public virtual void Heal(float Heal)
+    {
+        if (Health < startingHealth && Health > 0)
+        {
+            Health = Mathf.Min(Health + Heal, startingHealth);
+        }
+    }
 }
+
+/*
+
+public virtual void AddHealth(int add)
+{
+    Health = Mathf.Clamp(Health + add, 0, startingHealth);  
+}
+
+*/

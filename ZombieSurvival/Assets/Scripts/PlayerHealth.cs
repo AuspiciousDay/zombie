@@ -10,10 +10,10 @@ public class PlayerHealth : LivingEntity
 
     public AudioClip hitClip;
     public AudioClip deathClip;
-    
+
     private AudioSource playerAudioSource;
     private Animator playerAnimator;
-    
+
     private PlayerMovement playerMovement;
     private PlayerInput playerInput;
 
@@ -41,9 +41,9 @@ public class PlayerHealth : LivingEntity
     {
         if (!IsDeath)
         {
-            playerAudioSource.PlayOneShot(hitClip);    
+            playerAudioSource.PlayOneShot(hitClip);
         }
-        
+
         base.OnDamage(damage, hitPoint, hitNormal);
         uiHealth.fillAmount = Health / startingHealth;
     }
@@ -60,5 +60,10 @@ public class PlayerHealth : LivingEntity
 
         uiMaxHealth.gameObject.SetActive(false);
         uiHealth.gameObject.SetActive(false);
+    }
+    public override void Heal(float Heal)
+    {
+        base.Heal(Heal);
+        uiHealth.fillAmount = Health / startingHealth;
     }
 }

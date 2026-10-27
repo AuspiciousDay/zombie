@@ -4,7 +4,8 @@ using System.Collections;
 
 public class ZombieSpawner : MonoBehaviour
 {
-    public UIManager uIManager;
+    private GameManager gameManager;
+    private UIManager uIManager;
     public Zombie zombiePrefab;
     public ZombieData[] zombieDatas;
     public Transform[] spawnPoints;
@@ -14,9 +15,15 @@ public class ZombieSpawner : MonoBehaviour
 
     private int wave = 0;
 
+    private void Start()
+    {
+        GameObject findGo = GameObject.FindWithTag("GameController");
+        gameManager = findGo.GetComponent<GameManager>();
+        uIManager = gameManager.uIManager;
+    }
     private void Update()
     {
-        if(zombies.Count == 0)
+        if (zombies.Count == 0)
         {
             SpawnWave();
         }
@@ -27,36 +34,39 @@ public class ZombieSpawner : MonoBehaviour
         wave++;
 
         int count = Mathf.RoundToInt(wave * 1.5f);
-        for(int i = 0; i < count; i++)
+        for (int i = 0; i < count; i++)
         {
-            CreateZomie();
+            CreateZombie();
         }
 
         uIManager.SetWaveText(wave, zombies.Count);
     }
 
-    private void CreateZomie()
+    private void CreateZombie()
     {
         Transform point = spawnPoints[Random.Range(0, spawnPoints.Length)];
         ZombieData data = zombieDatas[Random.Range(0, zombieDatas.Length)];
 
         Zombie zombie;
-        if(zombiePool.Count == 0)
+        if (zombiePool.Count == 0)
         {
             zombie = Instantiate(zombiePrefab);
             zombie.gameObject.SetActive(false);
             zombiePool.Add(zombie);
+
+            zombie.OnDead.AddListener(() => zombies.Remove(zombie));
+            zombie.OnDead.AddListener(() => uIManager.SetWaveText(wave, zombies.Count));
+            zombie.OnDead.AddListener(() => StartCoroutine(CoReturnToPoolZombies(zombie)));
+            zombie.OnDead.AddListener(() => gameManager.AddScore(50));
         }
         zombie = zombiePool[0];
         zombie.Setup(data);
         zombie.transform.position = point.position;
         zombie.transform.rotation = point.rotation;
         zombie.gameObject.SetActive(true);
+
         zombies.Add(zombie);
         zombiePool.Remove(zombie);
-        zombie.OnDead.AddListener(() => zombies.Remove(zombie));
-        zombie.OnDead.AddListener(() => uIManager.SetWaveText(wave, zombies.Count));
-        zombie.OnDead.AddListener(() => StartCoroutine(CoReturnToPoolZombies(zombie)));
     }
 
     private IEnumerator CoReturnToPoolZombies(Zombie zombie)
@@ -64,5 +74,13 @@ public class ZombieSpawner : MonoBehaviour
         yield return new WaitForSeconds(5f);
         zombie.gameObject.SetActive(false);
         zombiePool.Add(zombie);
+    }
+
+    public void OnEndGame()
+    {
+        for(int i = zombies.Count -1 ; i >= 0 ; i--)
+        {
+            zombies[i].Die();
+        }
     }
 }

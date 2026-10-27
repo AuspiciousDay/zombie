@@ -15,14 +15,14 @@ public class Zombie : LivingEntity
     public LayerMask targetLayer;
 
     public float traceDistance = 10f;
-    public float attackDistance = 1f;
-    
+    public float attackDistance = 1.2f;
+
     public ParticleSystem bloodEffect;
     public Collider zombieCollider;
     public Renderer zombieRenderer;
     public AudioClip hitClip;
     public AudioClip deathClip;
-    
+
     private NavMeshAgent agent;
     private Animator zombieAnimator;
     private AudioSource zombieAudioSource;
@@ -30,11 +30,8 @@ public class Zombie : LivingEntity
     public float damage = 10f;
     private float lastAttackTime;
     public float attackInterval = 1f;
-
-    private float lastDeathTime;
-
     private Status currentStatus;
-    
+
     public static readonly int IdHasTarget = Animator.StringToHash("HasTarget");
     public static readonly int IdDie = Animator.StringToHash("Die");
     public Status CurrentStatus
@@ -95,7 +92,7 @@ public class Zombie : LivingEntity
             case Status.Attack:
                 UpdateAttack();
                 break;
-            case Status.Die:    
+            case Status.Die:
                 UpdateDie();
                 break;
         }
@@ -113,7 +110,7 @@ public class Zombie : LivingEntity
         }
 
         zombieCollider.enabled = true;
-        
+
         CurrentStatus = Status.Idle;
     }
 
@@ -131,30 +128,33 @@ public class Zombie : LivingEntity
 
     private void UpdateAttack()
     {
-        if(target == null || Vector3.Distance(transform.position, target.position) > attackDistance)
+        if (target == null || Vector3.Distance(transform.position, target.position) > attackDistance)
         {
             CurrentStatus = Status.Trace;
             return;
         }
 
-        if(Time.time >= lastAttackTime + attackInterval)
+        if (Time.time >= lastAttackTime + attackInterval)
         {
             lastAttackTime = Time.time;
             IDamageable damageable = target.GetComponent<IDamageable>();
-            var hitNormal = (transform.position - target.position).normalized;
-            damageable.OnDamage(damage, transform.position, hitNormal);
+            if (damageable != null)
+            {
+                var hitNormal = (transform.position - target.position).normalized;
+                damageable.OnDamage(damage, transform.position, hitNormal);
+            }
         }
     }
 
     private void UpdateTrace()
     {
-        if(target == null || Vector3.Distance(transform.position, target.position) > traceDistance)
+        if (target == null || Vector3.Distance(transform.position, target.position) > traceDistance)
         {
             target = null;
             CurrentStatus = Status.Idle;
             return;
         }
-        if(Vector3.Distance(transform.position, target.position) < attackDistance)
+        if (Vector3.Distance(transform.position, target.position) < attackDistance)
         {
             CurrentStatus = Status.Attack;
             return;
@@ -164,7 +164,7 @@ public class Zombie : LivingEntity
 
     private void UpdateIdle()
     {
-        if(target != null && Vector3.Distance(transform.position, target.position) < traceDistance)
+        if (target != null && Vector3.Distance(transform.position, target.position) < traceDistance)
         {
             CurrentStatus = Status.Trace;
             return;
@@ -178,12 +178,12 @@ public class Zombie : LivingEntity
         Collider[] colliders = Physics.OverlapSphere(transform.position, radius, targetLayer);
 
         Transform closet = null;
-        float closetDistance = float. MaxValue;
+        float closetDistance = float.MaxValue;
 
-        for(int i = 0; i < colliders.Length; i++)
+        for (int i = 0; i < colliders.Length; i++)
         {
             float distance = Vector3.Distance(transform.position, colliders[i].transform.position);
-            if(distance < closetDistance)
+            if (distance < closetDistance)
             {
                 closetDistance = distance;
                 closet = colliders[i].transform;

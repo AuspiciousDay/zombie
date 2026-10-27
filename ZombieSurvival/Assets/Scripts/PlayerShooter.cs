@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class PlayerShooter : MonoBehaviour
 {
-    public static readonly int  IdReload = Animator.StringToHash("Reload");
+    public static readonly int IdReload = Animator.StringToHash("Reload");
 
     public Gun gun;
 
@@ -26,12 +26,12 @@ public class PlayerShooter : MonoBehaviour
             gun.Fire();
         }
         else if (playerInput.Reload && gun.Reload())
-        {            
+        {
             playerAnimator.SetTrigger(IdReload);
-            gun.Reload();                     
+            gun.Reload();
         }
     }
-    
+
 
     private void OnAnimatorIK(int layerIndex)
     {
